@@ -1,0 +1,206 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f0f2f5;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.video-container {
+  display: flex;
+  gap: 20px;
+  height: 50vh; /* Exactly 50% of viewport height */
+  width: 100%;
+}
+
+.video-screen {
+  flex: 1;
+  background-color: #212121;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #212121;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  /* This overlay will only be visible when video is not playing */
+}
+
+#localVideo:playing ~ .video-overlay,
+#remoteVideo:playing ~ .video-overlay {
+  display: none;
+}
+
+#local-screen {
+  border-bottom: 4px solid #4361ee;
+}
+
+#remote-screen {
+  border-bottom: 4px solid #3cb371;
+}
+
+.screen-label {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 2;
+}
+
+.video-controls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.video-control-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.video-control-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.video-control-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding-top: 10px;
+}
+
+.button {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.primary-button {
+  background-color: #4361ee;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #3a56d4;
+}
+
+.secondary-button {
+  background-color: #3cb371;
+  color: white;
+}
+
+.secondary-button:hover {
+  background-color: #329d61;
+}
+
+.join-container {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.join-container input {
+  flex: 1;
+  padding: 14px 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+}
+
+.join-container input:focus {
+  border-color: #4361ee;
+}
+
+.join-container button {
+  white-space: nowrap;
+}
+
+.user-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-icon svg {
+  width: 60px;
+  height: 60px;
+  fill: #727272;
+}
+
+/* Responsive design for tablets and below */
+@media (max-width: 768px) {
+  .video-container {
+      flex-direction: column;
+      height: auto;
+  }
+  
+  .video-screen {
+      height: 25vh;
+  }
+}
