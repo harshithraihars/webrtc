@@ -23,17 +23,14 @@ const servers = {
 };
 // generate the icecandidates
 let pc = new RTCPeerConnection(servers);
+let localstream = null;
+let remotestream = new MediaStream();
 const webcamButton = document.querySelector(".webcam");
 const startCallButton = document.querySelector(".call");
 const InputCode = document.querySelector(".InputCode");
 const JoinCallButton = document.querySelector(".join");
 const localVideo = document.querySelector("#localVideo");
 const remoteVideo = document.querySelector("#remoteVideo");
-
-let localstream = null;
-localVideo.srcObject=localstream
-let remotestream = new MediaStream();
-remoteVideo.srcObject = remotestream;
 console.log(
   webcamButton,
   startCallButton,
@@ -54,6 +51,12 @@ webcamButton.addEventListener("click", async () => {
 
   localVideo.srcObject = localstream;
   localVideo.muted = true; // Optional: mute local video
+
+  localstream.getTracks().forEach((track) => {
+    console.log("📹 Local track kind:", track.kind, "ID:", track.id);
+  });
+
+
 });
 
 
@@ -111,6 +114,7 @@ pc.ontrack = (event) => {
   console.log("🔁 Received remote track:", event.streams[0]);
 
   event.streams[0].getTracks().forEach((track) => {
+    console.log("🎥 Remote track kind:", track.kind, "ID:", track.id);
     remotestream.addTrack(track);
   });
 
