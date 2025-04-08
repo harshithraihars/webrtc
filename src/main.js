@@ -124,9 +124,19 @@ pc.ontrack = (event) => {
   }
 };
 JoinCallButton.addEventListener("click", async () => {
-  remoteVideo.srcObject=remotestream
+  localstream = await navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true,
+  });
+  localVideo.srcObject = localstream;
+  localVideo.muted = true;
+
+  localstream.getTracks().forEach((track) => {
+    pc.addTrack(track, localstream);
+  });
+
   const callId = InputCode.value;
-  const callDoc = doc(db, "calls", callId); // ✅ correct way
+  const callDoc = doc(db, "calls", callId);
   const answerCandidates = collection(callDoc, "answercandidates");
   const offerCandidates = collection(callDoc, "offerCandidates");
 
@@ -135,7 +145,6 @@ JoinCallButton.addEventListener("click", async () => {
   };
 
   const callData = (await getDoc(callDoc)).data();
-  console.log(callData); // ✅ should no longer be undefined
 
   const offerdescription = callData.offer;
   await pc.setRemoteDescription(new RTCSessionDescription(offerdescription));
@@ -152,12 +161,12 @@ JoinCallButton.addEventListener("click", async () => {
 
   onSnapshot(offerCandidates, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
-      let data=change.doc.data()
       if (change.type === "added") {
-        pc.addIceCandidate(new RTCIceCandidate(data));
+        pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
       }
     });
   });
 });
+
 
 
