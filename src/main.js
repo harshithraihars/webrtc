@@ -52,11 +52,6 @@ webcamButton.addEventListener("click", async () => {
   localVideo.srcObject = localstream;
   localVideo.muted = true; // Optional: mute local video
 
-  localstream.getTracks().forEach((track) => {
-    console.log("📹 Local track kind:", track.kind, "ID:", track.id);
-  });
-
-
 });
 
 
@@ -128,12 +123,10 @@ JoinCallButton.addEventListener("click", async () => {
     video: true,
     audio: true,
   });
+
+  
   localVideo.srcObject = localstream;
   localVideo.muted = true;
-
-  localstream.getTracks().forEach((track) => {
-    pc.addTrack(track, localstream);
-  });
 
   const callId = InputCode.value;
   const callDoc = doc(db, "calls", callId);
