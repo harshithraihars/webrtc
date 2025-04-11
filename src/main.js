@@ -51,7 +51,6 @@ webcamButton.addEventListener("click", async () => {
 
   localVideo.srcObject = localstream;
   localVideo.muted = true; // Optional: mute local video
-
 });
 
 
@@ -109,7 +108,7 @@ pc.ontrack = (event) => {
   console.log("🔁 Received remote track:", event.streams[0]);
 
   event.streams[0].getTracks().forEach((track) => {
-    console.log("🎥 Remote track kind:", track.kind, "ID:", track.id);
+    console.log("✅ Remote track kind:", track.kind);
     remotestream.addTrack(track);
   });
 
@@ -119,17 +118,11 @@ pc.ontrack = (event) => {
   }
 };
 JoinCallButton.addEventListener("click", async () => {
-  localstream = await navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: true,
-  });
-
+  console.log("hello");
   
-  localVideo.srcObject = localstream;
-  localVideo.muted = true;
-
+  remoteVideo.srcObject=remotestream
   const callId = InputCode.value;
-  const callDoc = doc(db, "calls", callId);
+  const callDoc = doc(db, "calls", callId); // ✅ correct way
   const answerCandidates = collection(callDoc, "answercandidates");
   const offerCandidates = collection(callDoc, "offerCandidates");
 
@@ -138,6 +131,7 @@ JoinCallButton.addEventListener("click", async () => {
   };
 
   const callData = (await getDoc(callDoc)).data();
+  console.log(callData); // ✅ should no longer be undefined
 
   const offerdescription = callData.offer;
   await pc.setRemoteDescription(new RTCSessionDescription(offerdescription));
@@ -154,12 +148,10 @@ JoinCallButton.addEventListener("click", async () => {
 
   onSnapshot(offerCandidates, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
+      let data=change.doc.data()
       if (change.type === "added") {
-        pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+        pc.addIceCandidate(new RTCIceCandidate(data));
       }
     });
   });
 });
-
-
-
