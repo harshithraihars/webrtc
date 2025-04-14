@@ -16,10 +16,14 @@ const db = getFirestore(app);
 const servers = {
   iceServers: [
     {
-      urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
+      urls: "stun:stun.l.google.com:19302",
+    },
+    {
+      urls: "turn:relay1.expressturn.com:3478",
+      username: "efree",
+      credential: "efree",
     },
   ],
-  iceCandidatePoolSize: 10,
 };
 // generate the icecandidates
 let pc = new RTCPeerConnection(servers);
@@ -97,6 +101,14 @@ startCallButton.addEventListener("click", async () => {
     })
   })
 });
+
+pc.onconnectionstatechange = () => {
+  console.log("🧩 Connection state changed:", pc.connectionState);
+};
+pc.oniceconnectionstatechange = () => {
+  console.log("❄️ ICE state:", pc.iceConnectionState);
+};
+
 
 pc.ontrack = (event) => {
   console.log("🔁 Received remote track:", event.streams[0]);
