@@ -23,17 +23,14 @@ const servers = {
 };
 // generate the icecandidates
 let pc = new RTCPeerConnection(servers);
+let localstream = null;
+let remotestream = new MediaStream();
 const webcamButton = document.querySelector(".webcam");
 const startCallButton = document.querySelector(".call");
 const InputCode = document.querySelector(".InputCode");
 const JoinCallButton = document.querySelector(".join");
 const localVideo = document.querySelector("#localVideo");
 const remoteVideo = document.querySelector("#remoteVideo");
-
-let localstream = null;
-localVideo.srcObject=localstream
-let remotestream = new MediaStream();
-remoteVideo.srcObject = remotestream;
 console.log(
   webcamButton,
   startCallButton,
@@ -54,6 +51,10 @@ webcamButton.addEventListener("click", async () => {
 
   localVideo.srcObject = localstream;
   localVideo.muted = true; // Optional: mute local video
+
+  localstream.getTracks().forEach((track) => {
+    console.log("📹 Local track kind:", track.kind, "ID:", track.id);
+  });
 });
 
 
@@ -65,28 +66,20 @@ startCallButton.addEventListener("click", async () => {
 
   InputCode.value = callDoc.id;
 
-  // ice candidate is a potential ip address and port number which helps you to connect
   pc.onicecandidate = (event) => {
     event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
   };
-  // create offer
 
   const offerdescription = await pc.createOffer();
   await pc.setLocalDescription(offerdescription);
-
-  // session description protocall
 
   const offer = {
     sdp: offerdescription.sdp,
     type: offerdescription.type,
   };
 
-  // the sdp contains special informations
-
   await setDoc(callDoc, { offer });
 
-
-  // we wait our database to any change and if there is we updtae in the peer connection 
   onSnapshot(callDoc, (snapshot)=>{
     const data=snapshot.data()
     if(!pc.currentRemoteDescription && data.answer){
@@ -95,7 +88,6 @@ startCallButton.addEventListener("click", async () => {
     }
   })
 
-  // anny time the answercandidates in the db chnages  it tells which new doc is added we create a new ice candidate and add to the peer connection
   onSnapshot(answerCandidates, snapshot =>{
     snapshot.docChanges().forEach((change)=>{
       if(change.type=="added"){
@@ -103,14 +95,14 @@ startCallButton.addEventListener("click", async () => {
         pc.addIceCandidate(candidate)
       }
     })
-    })
+  })
 });
 
-// answering a call is same as that of reciving the call
 pc.ontrack = (event) => {
   console.log("🔁 Received remote track:", event.streams[0]);
 
   event.streams[0].getTracks().forEach((track) => {
+    console.log("🎥 Remote track kind:", track.kind, "ID:", track.id);
     remotestream.addTrack(track);
   });
 
@@ -119,10 +111,11 @@ pc.ontrack = (event) => {
     remoteVideo.play().catch((e) => console.log("Remote play error", e));
   }
 };
+
 JoinCallButton.addEventListener("click", async () => {
   remoteVideo.srcObject=remotestream
   const callId = InputCode.value;
-  const callDoc = doc(db, "calls", callId); // ✅ correct way
+  const callDoc = doc(db, "calls", callId);
   const answerCandidates = collection(callDoc, "answercandidates");
   const offerCandidates = collection(callDoc, "offerCandidates");
 
@@ -131,7 +124,7 @@ JoinCallButton.addEventListener("click", async () => {
   };
 
   const callData = (await getDoc(callDoc)).data();
-  console.log(callData); // ✅ should no longer be undefined
+  console.log(callData);
 
   const offerdescription = callData.offer;
   await pc.setRemoteDescription(new RTCSessionDescription(offerdescription));
@@ -155,5 +148,3 @@ JoinCallButton.addEventListener("click", async () => {
     });
   });
 });
-
-
